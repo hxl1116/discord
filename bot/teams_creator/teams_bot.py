@@ -47,9 +47,10 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+    if message.channel.id != teams_channel or message.channel.id != test_channel:
+        return
 
     if message.content.startswith('/'):
-        # TODO: Extrapolate teams webhook setup to function
         if message.content == ('/teams' or '/t'):
             # Set teams to most recent teams
             teams_webhook.set_teams(creator.get_teams())
