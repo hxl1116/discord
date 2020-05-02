@@ -154,4 +154,5 @@ cython_debug/
 # Sensitive file directories
 /resources/nasa_apod
 /resources/teams_creator
-/resources/test_credentials.json
+/resources/eft_ammo
+/resources/**/*_credentials.json

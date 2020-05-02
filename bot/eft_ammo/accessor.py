@@ -7,6 +7,8 @@ from pymongo import MongoClient
 resources_root = '/Users/henrylarson/PycharmProjects/eft-api/resources/'
 credentials_root = 'credentials.json'
 
+query_regex = '(?=.*%s)'
+
 
 class Accessor:
     credentials = {}
@@ -28,8 +30,16 @@ class Accessor:
         self.client = MongoClient(connection_string)
         self.database = self.client['eft_ammo']
 
-    def get_cartridge(self, cartridge=''):
-        return self.database.get_collection('all_cartridges').find({'nom': {'$regex': '%s+|'.join(cartridge)}})
+    def get_cartridge(self, params=None):
+        if params is None:
+            params = []
+        return [cartridge for cartridge in self.database.get_collection('all_cartridges')
+                .find({'nom': {'$regex': ''.join([query_regex % param for param in params])}})]
+
+    def display_cartridge(self, params=None):
+        if params is None:
+            params = []
+        [print(cartridge) for cartridge in self.get_cartridge(params)]
 
 
 class Encoder(json.JSONEncoder):
@@ -42,5 +52,4 @@ class Encoder(json.JSONEncoder):
 
 if __name__ == '__main__':
     accessor = Accessor()
-    cartridges = accessor.get_cartridge()
-    [print(cartridge) for cartridge in cartridges]
+    accessor.display_cartridge(['BZT', 'gzh'])
