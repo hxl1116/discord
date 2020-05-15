@@ -29,7 +29,7 @@ class Accessor:
         'spc': {'def': '(?=.*%s)'},
         'sld': {'def': '(?=.*%s)'}
     }
-    identifiers = ['+', '-', '.']
+    identifiers = ['+', '-']
 
     def __init__(self):
         self.load_credentials()
@@ -57,7 +57,8 @@ class Accessor:
     def get_regex(self, query, params):
         logging.info('Query: %s\nParams: %s' % (query, params))
         regex_string = ''.join([
-            self.query_regexes[query][self.get_identifier(param)] % param for param in params
+            self.query_regexes[query][self.get_identifier(param)] %
+            param.translate({ord(identifier): None for identifier in self.identifiers}) for param in params
         ])
         logging.info('Regex String: %s' % regex_string)
         return regex_string
@@ -69,6 +70,12 @@ class Accessor:
                 return None
             elif 'res' in command_string.keys():
                 return self.get_result_cartridge(int(command_string['res'][0]) - 1)
+            elif 'next' in command_string.keys():
+                self.cartridges = self.cartridges[5:] + self.cartridges[:5]
+                return self.cartridges
+            elif 'prev' in command_string.keys():
+                self.cartridges = self.cartridges[-5:] + self.cartridges[:-5]
+                return self.cartridges
             else:
                 query_string = {
                     query: {'$regex': self.get_regex(query=query, params=params)}

@@ -12,7 +12,8 @@ client = Client()
 accessor = Accessor()
 webhook = EFTWebhook(test_mode=True)
 
-resources_root = '/Users/henrylarson/PycharmProjects/discord/resources/'
+test_resources_root = '/Users/henrylarson/PycharmProjects/discord/resources/'
+prod_resources_root = '~/Discord/resources/'
 credentials_root = 'eft_ammo/bot_credentials.json'
 log_file = 'eft_ammo/eft_bot.log'
 
@@ -20,22 +21,22 @@ credentials = {}
 eft_channel_id = 400833561885802496
 test_channel_id = 688191103706333185
 
-# TODO: Add '-next' and '-prev' entries
-flags = {
-    '-nom': 'Get the cartridge(s) matching the given name identifier(s)',
-    '-dmg': 'Get the cartridge(s) matching the given damage value',
-    '-pen': 'Get the cartridge(s) matching the given penetration value',
-    '-arm': 'Get the cartridge(s) matching the given armor damage value',
-    '-acc': 'Get the cartridge(s) matching the given accuracy value',
-    '-rec': 'Get the cartridge(s) matching the given recoil value',
-    '-frg': 'Get the cartridge(s) matching the given fragmentation chance value',
-    '-ric': 'Get the cartridge(s) matching the given ricochet chance value',
-    '-vel': 'Get the cartridge(s) matching the given projectile speed value',
-    '-spc': 'Get the cartridge(s) matching the given special attribute value',
-    '-sld': 'Get the cartridge(s) matching the given "sold by" value',
-    '-res': 'Get the cartridge with the given result identifier',
-    '-help': 'Show this list of commands'
-}
+flags = ['-nom',
+         '-dmg',
+         '-pen',
+         '-arm',
+         '-acc',
+         '-rec',
+         '-frg',
+         '-ric',
+         '-vel',
+         '-spc',
+         '-sld',
+         '-res',
+         '-next',
+         '-prev',
+         '-help'
+         ]
 
 
 @client.event
@@ -53,11 +54,12 @@ async def on_message(message):
 
     if message.content.startswith('/eft'):
         # Split arguments and discard '/eft'
-        if any(flag in message.content for flag in flags.keys()):  # If using a flag operator
+        if any(flag in message.content for flag in flags):  # If using a flag operator
             # Param groups by flag sans '/eft'
             command_string = {group[0][1:]: list(filter(None, group[1:]))
-                      for group in [param.split(' ')
-                                    for param in list(filter(None, re.split('((?=-[^0-9]){3})', message.content)[1:]))]}
+                              for group in [param.split(' ')
+                                            for param in
+                                            list(filter(None, re.split('((?=-[^0-9]){3})', message.content)[1:]))]}
         else:  # Not using a flag operator
             # Params sans '/eft'
             command_string = message.content.split(' ')[1:]
@@ -70,18 +72,18 @@ async def on_message(message):
         await webhook.fire()
 
 
-def load_credentials():
+def load_credentials(resources_root):
     for key, value in json.load(open(os.path.join(resources_root, credentials_root))).items():
         credentials[key] = value
 
 
 def main():
-    load_credentials()
-    client.run(credentials['token'])
+    resources_root, token = (test_resources_root, 'token') if 'test' in sys.argv else (prod_resources_root, 'testToken')
+
+    load_credentials(resources_root=resources_root)
+    logging.basicConfig(filename=os.path.join(resources_root, log_file))
+    client.run(credentials[token])
 
 
 if __name__ == '__main__':
-    if 'test' in sys.argv:
-        credentials_root = 'test_credentials.json'
-        logging.basicConfig(filename=os.path.join(resources_root, log_file), level=logging.INFO)
     main()
