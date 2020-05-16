@@ -152,7 +152,4 @@ dmypy.json
 cython_debug/
 
 # Sensitive file directories
-/resources/nasa_apod
-/resources/teams_creator
-/resources/eft_ammo
 /resources/**/*_credentials.json
