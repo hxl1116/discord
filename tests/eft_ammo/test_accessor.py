@@ -5,8 +5,7 @@ from bot.eft_ammo.accessor import Accessor
 
 class AccessorTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.accessor = Accessor()
-        pass
+        self.accessor = Accessor(test_mode=True)
 
     def test_default_identifier(self):
         self.assertEqual('def', self.accessor.get_identifier('PS12'))
