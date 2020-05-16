@@ -61,7 +61,7 @@ async def on_message(message):
     # Prevent infinite message loop
     if message.author == client.user:
         return
-    # Prevent production bot responding to tests
+    # Prevent production bot responding to test
     if 'test' not in sys.argv and message.channel.id == test_channel_id:
         return
     # Prevent messaging outside of 'test' and 'eft' channels
