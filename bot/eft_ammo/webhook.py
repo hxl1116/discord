@@ -4,7 +4,8 @@ import os
 from aiohttp import ClientSession
 from discord import AsyncWebhookAdapter, Embed, Webhook
 
-resources_root = '/Users/henrylarson/PycharmProjects/discord/resources/'
+test_resources_root = '/Users/henrylarson/PycharmProjects/discord/resources/'
+prod_resources_root = '/home/pi/Discord/resources/'
 credentials_root = 'eft_ammo/bot_credentials.json'
 
 flags = {
@@ -34,7 +35,7 @@ class EFTWebhook:
     def __init__(self, test_mode=False):
         self.test_mode = test_mode
         self.info = json.load(
-            open(os.path.join(resources_root, credentials_root)))
+            open(os.path.join(test_resources_root if self.test_mode else prod_resources_root, credentials_root)))
 
     def set_items(self, items):
         self.cartridges = items
@@ -60,7 +61,10 @@ class EFTWebhook:
             embed = Embed.from_dict({'title': self.cartridges[0]['nom']}).set_thumbnail(url=self.cartridges[0]['ico'])
             for key, val in [key for key in self.cartridges[0].items()][2:]:
                 if val:
-                    embed.add_field(name=self.key_conversions[key], value=val, inline=True)
+                    if isinstance(val, list):
+                        embed.add_field(name=self.key_conversions[key], value=', '.join(val), inline=True)
+                    else:
+                        embed.add_field(name=self.key_conversions[key], value=val, inline=True)
             return embed
         else:
             # Results list embed

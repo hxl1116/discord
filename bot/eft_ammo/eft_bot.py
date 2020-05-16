@@ -9,11 +9,9 @@ from discord import Client
 from webhook import EFTWebhook
 
 client = Client()
-accessor = Accessor()
-webhook = EFTWebhook(test_mode=True)
 
 test_resources_root = '/Users/henrylarson/PycharmProjects/discord/resources/'
-prod_resources_root = '~/Discord/resources/'
+prod_resources_root = '/home/pi/Discord/resources/'
 credentials_root = 'eft_ammo/bot_credentials.json'
 log_file = 'eft_ammo/eft_bot.log'
 
@@ -78,7 +76,8 @@ def load_credentials(resources_root):
 
 
 def main():
-    resources_root, token = (test_resources_root, 'token') if 'test' in sys.argv else (prod_resources_root, 'testToken')
+    resources_root, token = (test_resources_root, 'testToken') if 'test' in sys.argv \
+        else (prod_resources_root, 'token')
 
     load_credentials(resources_root=resources_root)
     logging.basicConfig(filename=os.path.join(resources_root, log_file))
@@ -86,4 +85,9 @@ def main():
 
 
 if __name__ == '__main__':
+    test_mode = True if 'test' in sys.argv else False
+
+    accessor = Accessor(test_mode=test_mode)
+    webhook = EFTWebhook(test_mode=test_mode)
+
     main()

@@ -5,8 +5,9 @@ import os
 from bson import ObjectId
 from pymongo import MongoClient
 
-resources_root = '/Users/henrylarson/PycharmProjects/eft-api/resources/'
-credentials_root = 'credentials.json'
+test_resources_root = '/Users/henrylarson/PycharmProjects/discord/resources/'
+prod_resources_root = '/home/pi/Discord/resources/'
+credentials_root = 'eft_ammo/db_credentials.json'
 
 
 class Accessor:
@@ -16,6 +17,7 @@ class Accessor:
 
     cartridges = []
 
+    # TODO: Add >/< operator functionality to 'exact' regex patterns
     query_regexes = {
         'nom': {'def': '(?=.*%s)'},
         'dmg': {'def': '^(%s){1}$'},
@@ -29,17 +31,19 @@ class Accessor:
         'spc': {'def': '(?=.*%s)'},
         'sld': {'def': '(?=.*%s)'}
     }
+
     identifiers = ['+', '-']
 
-    def __init__(self):
+    def __init__(self, test_mode=False):
+        self.test_mode = test_mode
         self.load_credentials()
         self.load_database()
 
     def load_credentials(self):
-        self.credentials = json.load(open(os.path.join(resources_root, credentials_root)))
+        self.credentials = json.load(open(os.path.join(test_resources_root if self.test_mode else prod_resources_root, credentials_root)))
 
     def load_database(self):
-        connection_string = str(self.credentials['connection']) \
+        connection_string = str(self.credentials['url']) \
             .replace('<username>', self.credentials['username']) \
             .replace('<password>', self.credentials['password'])
 
